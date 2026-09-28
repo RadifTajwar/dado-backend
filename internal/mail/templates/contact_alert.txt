@@ -1,0 +1,13 @@
+NEW CONTACT MESSAGE
+
+{{.Name}}
+{{.Email}}{{if .Phone}} · {{.Phone}}{{end}}
+
+About:    {{if .Service}}{{.Service}}{{else}}Not chosen{{end}}
+Received: {{.Received}}
+
+{{.Message}}
+
+Reply: {{.Email}}
+Open in admin: {{.AdminURL}}
+{{template "footer" .}}

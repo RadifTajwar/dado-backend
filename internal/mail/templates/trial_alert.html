@@ -1,0 +1,67 @@
+{{define "content"}}
+        <tr>
+          <td class="px" style="padding:40px 48px 0;">
+            <p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:11px;line-height:16px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:#a54a2a;"><span style="display:inline-block;width:22px;height:1px;background-color:#a54a2a;vertical-align:middle;margin-right:10px;font-size:1px;line-height:1px;">&nbsp;</span>New trial request</p>
+            <h1 class="h1" style="margin:14px 0 0;font-family:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;font-weight:400;font-size:32px;line-height:38px;letter-spacing:-0.4px;color:#17150F;mso-line-height-rule:exactly;">{{.Who}}</h1>
+            <p style="margin:8px 0 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:22px;color:#3D3830;">{{if .Company}}{{.Name}}&nbsp;&nbsp;·&nbsp;&nbsp;{{end}}<a href="mailto:{{.Email}}" style="color:#a54a2a;text-decoration:none;">{{.Email}}</a>{{if .Phone}}&nbsp;&nbsp;·&nbsp;&nbsp;{{.Phone}}{{end}}</p>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="px" style="padding:24px 48px 0;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #DDD6CA;">
+              <tr>
+                <td class="kv-key" width="112" valign="top" style="padding:10px 14px 10px 0;border-bottom:1px solid #DDD6CA;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:13px;line-height:20px;color:#6B645B;">Needs</td>
+                <td valign="top" style="padding:10px 0;border-bottom:1px solid #DDD6CA;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:20px;color:#17150F;font-weight:600;">{{.ServiceNames}}</td>
+              </tr>
+              <tr>
+                <td class="kv-key" width="112" valign="top" style="padding:10px 14px 10px 0;border-bottom:1px solid #DDD6CA;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:13px;line-height:20px;color:#6B645B;">Files</td>
+                <td valign="top" style="padding:10px 0;border-bottom:1px solid #DDD6CA;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:20px;color:#17150F;"><a href="{{.Link}}" style="color:#a54a2a;text-decoration:underline;">{{.LinkHost}}&nbsp;&#8599;</a></td>
+              </tr>
+              <tr>
+                <td class="kv-key" width="112" valign="top" style="padding:10px 14px 10px 0;border-bottom:1px solid #DDD6CA;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:13px;line-height:20px;color:#6B645B;">Volume</td>
+                <td valign="top" style="padding:10px 0;border-bottom:1px solid #DDD6CA;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:20px;color:#17150F;">{{if .Volume}}{{.Volume}}{{else}}Not given{{end}}</td>
+              </tr>
+              <tr>
+                <td class="kv-key" width="112" valign="top" style="padding:10px 14px 10px 0;border-bottom:1px solid #DDD6CA;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:13px;line-height:20px;color:#6B645B;">Turnaround</td>
+                <td valign="top" style="padding:10px 0;border-bottom:1px solid #DDD6CA;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:20px;color:#17150F;">{{if .Deadline}}{{.Deadline}}{{else}}Not given{{end}}</td>
+              </tr>
+              <tr>
+                <td class="kv-key" width="112" valign="top" style="padding:10px 14px 10px 0;border-bottom:1px solid #DDD6CA;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:13px;line-height:20px;color:#6B645B;">NDA</td>
+                <td valign="top" style="padding:10px 0;border-bottom:1px solid #DDD6CA;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:20px;{{if .NDA}}color:#a54a2a;font-weight:600;{{else}}color:#17150F;{{end}}">{{if .NDA}}Requested: sign before opening the files{{else}}Not requested{{end}}</td>
+              </tr>
+              <tr>
+                <td class="kv-key" width="112" valign="top" style="padding:10px 14px 10px 0;border-bottom:1px solid #DDD6CA;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:13px;line-height:20px;color:#6B645B;">Received</td>
+                <td valign="top" style="padding:10px 0;border-bottom:1px solid #DDD6CA;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:20px;color:#17150F;">{{.Received}}</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="px" style="padding:24px 48px 0;">
+            <p style="margin:0 0 10px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:11px;line-height:16px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#6B645B;">Brief</p>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#ECE7DF;border-left:2px solid #a54a2a;">
+              <tr>
+                <td style="padding:18px 22px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:24px;color:#17150F;">{{range $i, $line := lines .Brief}}{{if $i}}<br>{{end}}{{$line}}{{end}}</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="px" style="padding:28px 48px 44px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td bgcolor="#a54a2a" style="background-color:#a54a2a;border-radius:2px;">
+                  <a href="{{.ReplyURL}}" style="display:inline-block;padding:14px 26px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:18px;font-weight:600;letter-spacing:0.2px;color:#f3f0ea;text-decoration:none;border-radius:2px;">Reply to {{.FirstName}}</a>
+                </td>
+                <td width="16" style="font-size:0;line-height:0;">&nbsp;</td>
+                <td style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:18px;">
+                  <a href="{{.AdminURL}}" style="color:#a54a2a;text-decoration:underline;font-weight:600;">Open in admin&nbsp;&rarr;</a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+{{end}}

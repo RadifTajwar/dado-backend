@@ -1,0 +1,27 @@
+{{define "content"}}
+        <tr>
+          <td class="px" style="padding:48px 48px 0;">
+            <p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:11px;line-height:16px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:#a54a2a;"><span style="display:inline-block;width:22px;height:1px;background-color:#a54a2a;vertical-align:middle;margin-right:10px;font-size:1px;line-height:1px;">&nbsp;</span>Admin account</p>
+            <h1 class="h1" style="margin:16px 0 0;font-family:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;font-weight:400;font-size:38px;line-height:44px;letter-spacing:-0.5px;color:#17150F;mso-line-height-rule:exactly;">Reset your password</h1>
+            <p style="margin:20px 0 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:26px;color:#3D3830;">We got a request to reset the password for <strong style="color:#17150F;">{{.Email}}</strong>. The button below works once and expires in <strong style="color:#17150F;">30&nbsp;minutes</strong>.</p>
+          </td>
+        </tr>
+        <tr>
+          <td class="px" style="padding:28px 48px 0;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td bgcolor="#a54a2a" style="background-color:#a54a2a;border-radius:2px;">
+                  <a href="{{.Link}}" style="display:inline-block;padding:15px 30px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:18px;font-weight:600;letter-spacing:0.2px;color:#f3f0ea;text-decoration:none;border-radius:2px;">Choose a new password&nbsp;&rarr;</a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td class="px" style="padding:28px 48px 48px;">
+            <p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:13px;line-height:20px;color:#6B645B;">Button not working? Paste this link into your browser:</p>
+            <p style="margin:6px 0 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:13px;line-height:20px;word-break:break-all;"><a href="{{.Link}}" style="color:#a54a2a;text-decoration:underline;">{{.Link}}</a></p>
+            <p style="margin:22px 0 0;padding-top:18px;border-top:1px solid #DDD6CA;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:22px;color:#3D3830;">Didn't ask for this? Ignore this email. Your password stays the same.</p>
+          </td>
+        </tr>
+{{end}}

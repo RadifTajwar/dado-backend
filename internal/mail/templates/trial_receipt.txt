@@ -1,0 +1,20 @@
+Your trial request is in. Five files, on us.
+
+A producer is opening your link now. Within 30 minutes you'll have a reply confirming the scope, the timing and any questions about the brief.
+
+YOUR REQUEST
+Services:   {{.Services}}
+NDA:        {{if .NDA}}Requested. We sign before anyone opens your files.{{else}}Not requested{{end}}
+Turnaround: Photo and voice in 24 hours, video in 48
+
+ONE QUICK CHECK
+Make sure your link is set to "anyone with the link can view". If we can't open it, the clock doesn't start.
+
+WHAT HAPPENS NEXT
+01  We confirm the scope. A producer replies within 30 minutes with timing and any questions.
+02  We do the work. Photo and voice come back within 24 hours, video within 48.
+03  You judge the output. Full resolution, no watermark, and yours to keep whatever you decide.
+
+Price list: {{.SiteURL}}/services#pricing
+Questions in the meantime? Just reply to this email.
+{{template "footer" .}}

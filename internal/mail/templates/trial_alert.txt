@@ -1,0 +1,18 @@
+NEW TRIAL REQUEST
+
+{{.Who}}
+{{if .Company}}{{.Name}} · {{end}}{{.Email}}{{if .Phone}} · {{.Phone}}{{end}}
+
+Needs:      {{.ServiceNames}}
+Files:      {{.Link}}
+Volume:     {{if .Volume}}{{.Volume}}{{else}}Not given{{end}}
+Turnaround: {{if .Deadline}}{{.Deadline}}{{else}}Not given{{end}}
+NDA:        {{if .NDA}}Requested: sign before opening the files{{else}}Not requested{{end}}
+Received:   {{.Received}}
+
+BRIEF
+{{.Brief}}
+
+Reply: {{.Email}}
+Open in admin: {{.AdminURL}}
+{{template "footer" .}}

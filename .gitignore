@@ -1,0 +1,14 @@
+# secrets — only .env.example is committed
+.env
+.env.*
+!.env.example
+
+# build output
+bin/
+*.exe
+
+# local tooling
+.DS_Store
+
+# graft's local graph cache — regenerable, not committed (run `graft build`).
+/graft/

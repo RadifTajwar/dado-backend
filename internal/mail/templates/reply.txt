@@ -1,0 +1,7 @@
+{{range .Paragraphs}}{{range $i, $line := .}}{{if $i}}
+{{end}}{{$line}}{{end}}
+
+{{end}}--
+DADO Post-Production
+Photo, video & voice. Replies within 30 minutes, 24/7.
+{{template "footer" .}}

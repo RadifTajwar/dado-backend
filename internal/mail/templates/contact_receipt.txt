@@ -1,0 +1,17 @@
+Thanks for getting in touch. A producer has your message.
+
+Thank you for contacting DADO. A real person reads every message that comes in, and you'll hear back from a producer within 30 minutes, day or night.
+
+WHILE YOU WAIT
+Reply time: Under 30 minutes, any hour, seven days a week
+Urgent?     WhatsApp +880 1841 33 44 73 and someone picks up straight away
+Prices:     Every rate is published, so you can budget before you brief
+
+WHAT HAPPENS NEXT
+01  We read it properly. A producer looks at your question against volumes, formats and deadlines. No scripts.
+02  You get a straight answer. A reply within 30 minutes, with a fixed quote if you asked for one.
+03  See the work before you commit. Five files free, at full resolution, with no watermark and no card.
+
+Start a free trial: {{.SiteURL}}/free-trial#free
+See the full price list: {{.SiteURL}}/services#pricing
+{{template "footer" .}}

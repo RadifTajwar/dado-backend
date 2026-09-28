@@ -1,0 +1,8 @@
+{{define "footer"}}
+--
+DADO Post-Production · Photo, video & voice
+hello@dado.studio · +880 1841 33 44 73 · Dhaka, Bangladesh
+{{.SiteURL}}
+
+{{.Reason}}
+{{end}}

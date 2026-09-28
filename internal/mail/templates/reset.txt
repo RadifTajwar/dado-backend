@@ -1,0 +1,8 @@
+Reset your password
+
+We got a request to reset the password for {{.Email}}. This link works once and expires in 30 minutes:
+
+{{.Link}}
+
+Didn't ask for this? Ignore this email. Your password stays the same.
+{{template "footer" .}}
