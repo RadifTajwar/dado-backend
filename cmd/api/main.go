@@ -70,7 +70,7 @@ func run(seedDemo bool) error {
 
 	serveErr := make(chan error, 1)
 	go func() {
-		slog.Info("API listening", "addr", "http://localhost:"+cfg.Port, "uploads", cfg.UploadsEnabled())
+		slog.Info("API listening", "addr", "http://localhost:"+cfg.Port, "uploads", cfg.UploadsEnabled(), "email", cfg.MailEnabled())
 		serveErr <- srv.ListenAndServe()
 	}()
 

@@ -1,25 +1,37 @@
-// Package mail sends the site's emails through Gmail SMTP.
+// Package mail sends the site's emails through the Gmail API (HTTPS).
 package mail
 
 import (
 	"bytes"
 	"crypto/rand"
-	"crypto/tls"
+	"encoding/base64"
 	"encoding/hex"
+	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"log/slog"
 	"mime"
 	"mime/multipart"
 	"mime/quotedprintable"
-	"net"
+	"net/http"
 	"net/mail"
-	"net/smtp"
 	"net/textproto"
+	"net/url"
 	"strings"
 	"sync"
 	"time"
 
 	"dado/internal/config"
+)
+
+// ErrNotConfigured means the GMAIL_* settings are empty, so nothing is sent.
+var ErrNotConfigured = errors.New("email is not set up (the GMAIL_* settings are empty)")
+
+// Google's endpoints. Tests point them at a local server.
+var (
+	tokenURL = "https://oauth2.googleapis.com/token"
+	sendURL  = "https://gmail.googleapis.com/gmail/v1/users/me/messages/send"
 )
 
 // Message is one email with an HTML body and a plain-text alternative.
@@ -32,9 +44,14 @@ type Message struct {
 }
 
 type Mailer struct {
-	host, port string
-	user, pass string
-	from       mail.Address
+	enabled bool
+	from    mail.Address
+	oauth   url.Values // what Google needs to hand out an access token
+	client  *http.Client
+
+	mu      sync.Mutex // guards the cached access token
+	token   string
+	expires time.Time
 
 	siteURL     string
 	notifyEmail string
@@ -44,19 +61,26 @@ type Mailer struct {
 
 func New(cfg *config.Config) *Mailer {
 	return &Mailer{
-		host:        cfg.SMTPHost,
-		port:        cfg.SMTPPort,
-		user:        cfg.SMTPUser,
-		pass:        cfg.SMTPPass,
-		from:        mail.Address{Name: cleanHeader(cfg.MailFromName), Address: cfg.SMTPUser},
+		enabled: cfg.MailEnabled(),
+		from:    mail.Address{Name: cleanHeader(cfg.MailFromName), Address: cfg.GmailSender},
+		oauth: url.Values{
+			"client_id":     {cfg.GmailClientID},
+			"client_secret": {cfg.GmailClientSecret},
+			"refresh_token": {cfg.GmailRefreshToken},
+			"grant_type":    {"refresh_token"},
+		},
+		client:      &http.Client{Timeout: 30 * time.Second}, // a slow Google answer can't hang a request
 		siteURL:     cfg.SiteURL,
 		notifyEmail: cfg.NotifyEmail,
 	}
 }
 
-// Send delivers one message now. Every network step has a deadline, so a
-// stuck SMTP server can't hang a request.
+// Send delivers one message now through the Gmail API. It goes over HTTPS
+// (port 443) because hosts like Render's free plan block the SMTP ports.
 func (m *Mailer) Send(msg Message) error {
+	if !m.enabled {
+		return ErrNotConfigured
+	}
 	to, err := mail.ParseAddress(msg.To)
 	if err != nil {
 		return fmt.Errorf("invalid recipient: %w", err)
@@ -65,42 +89,76 @@ func (m *Mailer) Send(msg Message) error {
 	if err != nil {
 		return err
 	}
+	token, err := m.accessToken()
+	if err != nil {
+		return err
+	}
 
-	conn, err := net.DialTimeout("tcp", net.JoinHostPort(m.host, m.port), 10*time.Second)
+	body, _ := json.Marshal(map[string]string{"raw": base64.URLEncoding.EncodeToString(raw)})
+	req, err := http.NewRequest(http.MethodPost, sendURL, bytes.NewReader(body))
 	if err != nil {
 		return err
 	}
-	_ = conn.SetDeadline(time.Now().Add(30 * time.Second))
-	c, err := smtp.NewClient(conn, m.host)
-	if err != nil {
-		conn.Close()
-		return err
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Content-Type", "application/json")
+	if err := m.do(req, nil); err != nil {
+		m.forgetToken() // if Google rejected the token, the next send fetches a fresh one
+		return fmt.Errorf("gmail send: %w", err)
 	}
-	defer c.Close()
+	return nil
+}
 
-	if err := c.StartTLS(&tls.Config{ServerName: m.host}); err != nil {
-		return err
+// accessToken trades the long-lived refresh token for an access token and
+// reuses it until a minute before it expires (they last about an hour).
+func (m *Mailer) accessToken() (string, error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if m.token != "" && time.Now().Before(m.expires) {
+		return m.token, nil
 	}
-	if err := c.Auth(smtp.PlainAuth("", m.user, m.pass, m.host)); err != nil {
-		return err
+
+	req, err := http.NewRequest(http.MethodPost, tokenURL, strings.NewReader(m.oauth.Encode()))
+	if err != nil {
+		return "", err
 	}
-	if err := c.Mail(m.from.Address); err != nil {
-		return err
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	var out struct {
+		AccessToken string `json:"access_token"`
+		ExpiresIn   int    `json:"expires_in"`
 	}
-	if err := c.Rcpt(to.Address); err != nil {
-		return err
+	if err := m.do(req, &out); err != nil {
+		return "", fmt.Errorf("gmail token: %w", err)
 	}
-	w, err := c.Data()
+	if out.AccessToken == "" {
+		return "", errors.New("gmail token: Google returned no access token")
+	}
+	m.token = out.AccessToken
+	m.expires = time.Now().Add(time.Duration(out.ExpiresIn)*time.Second - time.Minute)
+	return m.token, nil
+}
+
+func (m *Mailer) forgetToken() {
+	m.mu.Lock()
+	m.token = ""
+	m.mu.Unlock()
+}
+
+// do sends req and decodes a JSON answer into out (when out isn't nil). Any
+// non-2xx answer becomes an error that carries Google's explanation.
+func (m *Mailer) do(req *http.Request, out any) error {
+	res, err := m.client.Do(req)
 	if err != nil {
 		return err
 	}
-	if _, err := w.Write(raw); err != nil {
-		return err
+	defer res.Body.Close()
+	if res.StatusCode/100 != 2 {
+		detail, _ := io.ReadAll(io.LimitReader(res.Body, 512))
+		return fmt.Errorf("%s: %s", res.Status, bytes.TrimSpace(detail))
 	}
-	if err := w.Close(); err != nil {
-		return err
+	if out == nil {
+		return nil
 	}
-	return c.Quit()
+	return json.NewDecoder(res.Body).Decode(out)
 }
 
 // Go sends messages in the background, in order. Failures are logged, never

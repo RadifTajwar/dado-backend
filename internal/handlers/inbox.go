@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"log/slog"
 	"net/http"
 	"slices"
@@ -93,7 +94,7 @@ func (in *emailInput) validate() fieldErrors {
 	return f
 }
 
-// sendReply emails the admin's message right away. When SMTP fails it
+// sendReply emails the admin's message right away. When sending fails it
 // answers 502 and returns false, so the caller doesn't record a send that
 // never happened.
 func (h *Handler) sendReply(w http.ResponseWriter, r *http.Request, to string, in emailInput) bool {
@@ -108,6 +109,10 @@ func (h *Handler) sendReply(w http.ResponseWriter, r *http.Request, to string, i
 	}
 	if err := h.mail.Send(msg); err != nil {
 		slog.Error("admin email not sent", "err", err)
+		if errors.Is(err, mail.ErrNotConfigured) {
+			writeError(w, http.StatusServiceUnavailable, "Email isn't set up yet. Add the GMAIL_* settings to the API.")
+			return false
+		}
 		writeError(w, http.StatusBadGateway, "The email could not be sent. Try again in a minute.")
 		return false
 	}

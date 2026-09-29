@@ -44,7 +44,7 @@ func testHandler(t *testing.T) *Handler {
 		_ = d.Clients.Database().Drop(ctx)
 		_ = d.Close(ctx)
 	})
-	cfg := &config.Config{SiteURL: "http://localhost:3000", SMTPHost: "127.0.0.1", SMTPPort: "1", SMTPUser: "studio@example.com"}
+	cfg := &config.Config{SiteURL: "http://localhost:3000", GmailSender: "studio@example.com"} // no Gmail keys: email is off
 	return New(d, cfg, mail.New(cfg))
 }
 

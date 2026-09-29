@@ -22,12 +22,14 @@ type Config struct {
 	AdminEmail    string // first admin, created when none exists
 	AdminPassword string
 
-	SMTPHost     string
-	SMTPPort     string
-	SMTPUser     string
-	SMTPPass     string
-	MailFromName string
-	NotifyEmail  string // where new contact / trial alerts go
+	// Email goes out through the Gmail API over HTTPS (Render's free plan
+	// blocks SMTP ports). Empty = email disabled; everything else still works.
+	GmailSender       string // the Gmail account that sends (the From address)
+	GmailClientID     string
+	GmailClientSecret string
+	GmailRefreshToken string
+	MailFromName      string
+	NotifyEmail       string // where new contact / trial alerts go
 
 	CloudinaryCloud  string // empty = uploads disabled (503)
 	CloudinaryKey    string
@@ -53,27 +55,25 @@ func Load(envFile string) (*Config, error) {
 		AdminEmail:    strings.ToLower(get("ADMIN_EMAIL", "")),
 		AdminPassword: get("ADMIN_PASSWORD", ""),
 
-		SMTPHost:     get("SMTP_HOST", "smtp.gmail.com"),
-		SMTPPort:     get("SMTP_PORT", "587"),
-		SMTPUser:     get("SMTP_USER", ""),
-		SMTPPass:     strings.ReplaceAll(get("SMTP_PASS", ""), " ", ""), // Gmail shows app passwords in groups of four
-		MailFromName: get("MAIL_FROM_NAME", "DADO Post-Production"),
-		NotifyEmail:  get("NOTIFY_EMAIL", ""),
+		GmailSender:       strings.ToLower(get("GMAIL_SENDER", "")),
+		GmailClientID:     get("GMAIL_CLIENT_ID", ""),
+		GmailClientSecret: get("GMAIL_CLIENT_SECRET", ""),
+		GmailRefreshToken: get("GMAIL_REFRESH_TOKEN", ""),
+		MailFromName:      get("MAIL_FROM_NAME", "DADO Post-Production"),
+		NotifyEmail:       get("NOTIFY_EMAIL", ""),
 
 		CloudinaryCloud:  get("CLOUDINARY_CLOUD_NAME", ""),
 		CloudinaryKey:    get("CLOUDINARY_API_KEY", ""),
 		CloudinarySecret: get("CLOUDINARY_API_SECRET", ""),
 	}
 	if c.NotifyEmail == "" {
-		c.NotifyEmail = c.SMTPUser
+		c.NotifyEmail = c.GmailSender
 	}
 
 	var missing []string
 	for key, val := range map[string]string{
 		"MONGODB_URI": c.MongoURI,
 		"JWT_SECRET":  string(c.JWTSecret),
-		"SMTP_USER":   c.SMTPUser,
-		"SMTP_PASS":   c.SMTPPass,
 	} {
 		if val == "" {
 			missing = append(missing, key)
@@ -86,6 +86,11 @@ func Load(envFile string) (*Config, error) {
 		return nil, errors.New("JWT_SECRET must be at least 32 characters")
 	}
 	return c, nil
+}
+
+// MailEnabled reports whether all four Gmail settings are set.
+func (c *Config) MailEnabled() bool {
+	return c.GmailSender != "" && c.GmailClientID != "" && c.GmailClientSecret != "" && c.GmailRefreshToken != ""
 }
 
 // UploadsEnabled reports whether all three Cloudinary keys are set.
